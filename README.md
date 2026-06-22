@@ -26,7 +26,7 @@ Everything was run on a real ARM64 instance, not a laptop or emulator:
 
 2. SSH in and run: 
 
-## sudo apt update 
+sudo apt update 
 
 sudo apt install -y python3.11 python3.11-venv python3-pip alsa-utils iverilog python3.11 -m venv parvai-env source parvai-env/bin/activate 
 
