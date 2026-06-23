@@ -7,14 +7,10 @@ import numpy as np
 import pyttsx3
 import random
 
-# ---------------------------------------------------------------
-# YOLO INFERENCE — set once Task 1 picks the actual resolution
-# ---------------------------------------------------------------
 # RECOMMENDED_RES is set from Task 1's measured numbers (see results/task1_power_analysis.md Q3):
 # 416x416 chosen for the FPS/detail tradeoff — 11.34 FPS avg, more than double 640's
-# responsiveness, while retaining meaningfully more spatial detail than 320 for
-# smaller/farther object detection. All three resolutions clear the 12h battery
 # target on CPU power alone, so this call is made on FPS, not power.
+
 RECOMMENDED_RES = 416
 
 VIDEO_PATH = 'street_scene.mp4'
@@ -43,19 +39,7 @@ minute_start = time.time()
 
 
 def speak(msg):
-    # fresh engine per call — pyttsx3 can silently stop completing
-    # runAndWait() if one engine instance is reused across many calls
-    # inside a background thread (confirmed on Windows SAPI5, kept
-    # here defensively since the same risk hasn't been ruled out on
-    # the espeak/Linux backend either). reinit is cheap enough since
-    # alerts/scenes are seconds apart, not per-sample.
-    #
-    # watchdog: a real freeze was observed during a sustained run where
-    # runAndWait() appeared to hang indefinitely (Ctrl+C took unusually
-    # long to register, consistent with a stuck C-level call). speak()
-    # now runs on a daemon thread with a hard timeout — if it doesn't
-    # return within 5s, we abandon that call and move on rather than
-    # blocking the voice thread (and the whole pipeline) forever.
+   
     def _do_speak():
         try:
             local_eng = pyttsx3.init()
@@ -91,12 +75,10 @@ def voice_thread():
         else:
             time.sleep(0.05)
 
-
-# ---------------------------------------------------------------
 # THREAD 1 — YOLO inference, real
 # reads street_scene.mp4 in a loop, runs YOLO26n at RECOMMENDED_RES,
 # pushes detected object names into the voice queue
-# ---------------------------------------------------------------
+
 def yolo_thread():
     from ultralytics import YOLO
     import cv2
