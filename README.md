@@ -6,6 +6,7 @@ This is my submission for the Parvai Technologies Hardware-AI Bridge Task. It co
 
 ai-pipeline/ 
    integrated_pipeline.py                   #  Task  3:  combined  YOLO  +  fall  detection  +  TTS  pipeline 
+   
 firmware/ 
   fall_detector.py                          #  Task  2:  fall  detection,  synthetic  IMU  data,  timing  analysis 
   fall_detector_fsm.v                       #  Task  2/4:  synthesizable  Verilog  FSM  +  testbench 
@@ -76,7 +77,7 @@ A few issues I hit during development that aren’t obvious from the code:
 - **“terminate called without an active exception”** prints on every exit. It’s harmless results are already written by then. Likely an espeak C-binding cleanup issue, never fully tracked down but confirmed not affecting output across multiple runs. 
 - **The Verilog testbench needs one extra sample after fall 3.** The FSM only moves state when sample_valid pulses. Falls 1 and 2 get that pulse for free from the walking stimulus that follows them, but fall 3 is the last event before $finish. I added one trailing sample explicitly to let the FSM complete its final transition it’s a testbench detail, the FSM module itself is fine. 
 - **Fall detector timing is unstable between runs** (0.44–0.68µs average, 37–267µs worst case across 5 runs on the same instance with no other load). I checked background CPU and hypervisor steal time, both were zero. Most likely Python scheduler jitter. Reported as a range in task2_timing_analysis.md rather than picking one number.
-- 
+
 ## **A note on methodology:** 
 For Task 1, I ran each resolution twice to check if the numbers were stable, they were within 1% on FPS and essentially identical on CPU%. The values in the results files come from the cleaner of the two runs per resolution (explained in task1_fps.md). Task 3 was also run twice for the same reason. Run 1’s raw terminal output wasn’t saved after the run finished, so task3_run_log.md only shows Run 2’s complete log, with a note explaining why. 
 
