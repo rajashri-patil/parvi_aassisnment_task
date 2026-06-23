@@ -4,7 +4,7 @@ The task specifies a single 10 minute run. Two times run was done here as a deli
 
 Run 1’s headline numbers (avg/max CPU, memory drift, total alerts) matched Run 2’s closely when compared, and are referenced below for that comparison, but its table isn’t generated. 
 
-## **Run 2: full 10-minute log (real, complete)** 
+## **Run 2: full 10 minute log (real, complete)** 
 
 |**Time**<br>**(s)**|**CPU%**|**Memory**<br>**(MB)**|**Thread**<br>**s**|**Alerts**<br>**total**|**Alerts/min**|
 |---|---|---|---|---|---|
@@ -32,7 +32,7 @@ Run 1’s headline numbers (avg/max CPU, memory drift, total alerts) matched Run
 
 Avg CPU 52.5%, Max CPU 53.0% (below 85% throughout, 19 checkpoints). Memory 857.9 through 858.4MB (+0.50MB over 10 minutes), no leak. 10 alerts total, fall interrupt working, no deadlocks. Log stops at 570s, the last checkpoint before the script’s 600s loop exits (see “Independent duration cross check” below for confirmation the run genuinely lasted the full duration). 
 
-## **Run-to-run consistency** 
+## **consistency through all runs** 
 
 2’s come directly from the full table above. The two runs match closely. CPU within 0.1% on average, memory drift within 0.04MB, identical alert counts. That consistency is the actual evidence the system behaves predictably rather than having gotten lucky once, the comparison doesn’t depend on Run 1 having a surviving raw log, since its summary level numbers are still real, recorded output from that run, just not row-by-row. 
 
