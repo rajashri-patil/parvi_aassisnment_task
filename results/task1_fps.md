@@ -1,6 +1,6 @@
 ## **Task 1: YOLO26n FPS + CPU + Memory Measurement** 
 
-**Methodology note:** the task specifies one run per resolution. Each resolution was run twice as a deliberate repeatability check. Each resolution was run twice. Results were compared for consistency. The complete run with the most reliable logging output is reported. 
+**Methodology note:** the task specifies one run per resolution. Each resolution was run twice as a deliberate repeatability check. Results were compared for consistency. The complete run with the most reliable logging output is reported. 
 
 ## **Results:** 
 
