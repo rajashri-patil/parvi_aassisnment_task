@@ -5,8 +5,7 @@ This is my submission for the Parvai Technologies Hardware-AI Bridge Task. It co
 ## **Repo structure:** 
 
 ai-pipeline/ 
-   integrated_pipeline.py                   #  Task  3:  combined  YOLO  +  fall  detection  +  TTS  pipeline 
-   
+   integrated_pipeline.py                   #  Task  3:  combined  YOLO  +  fall  detection  +  TTS  pipeline    
 firmware/ 
   fall_detector.py                          #  Task  2:  fall  detection,  synthetic  IMU  data,  timing  analysis 
   fall_detector_fsm.v                       #  Task  2/4:  synthesizable  Verilog  FSM  +  testbench 
