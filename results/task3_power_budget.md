@@ -23,11 +23,9 @@
 
 **Fall detector (0.052mW):** derived from Task 2’s real measured timing, which showed real runto-run variance across 5 complete repeated runs (0.44-0.68us average, mean 0.52us per sample) rather than a single stable value, see task2_timing_analysis.md. The mean of those 5 measured averages is used here as the representative figure. 
 
-## General formula: 
+Formula & calculations:
 
 Cpu pct = (time used per sample us / sample budget us) * 100 power mw = (cpu pct / 100) x num cores x core tdp mw 
-
-Applied with measured values: 
 
 Fall detector cpu pct = (0.522 / 10,000) x100 = 0.0052% fall detector mw = (0.0052 / 100) x 2 cores x500mW = 0.052 mW 
 
@@ -37,7 +35,7 @@ This is consistent with Task 2’s finding that the fall detector FSM is idle 99
 
 _pyttsx3 was chosen because it installs cleanly as a standard pip package on ARM64 Ubuntu with no model downloads, keeping the environment straightforwardly reproducible. MeloTTS requires neural TTS weights and heavier dependencies that would have added setup complexity without changing the measurement, since what's being measured (combined CPU% above YOLO baseline) is independent of which TTS engine runs in the voice thread._ 
 
-## **Formula & calculations:** 
+Formula & calculations:
 
 combined power mw = (combined cpu pct / 100) x num cores x core tdp mw 
 
@@ -75,5 +73,5 @@ YOLO26n is the single largest consumer by a wide margin, and it’s also the onl
 
 pct of budget = (component mw / total mw) × 100 **yolo pct of budget = (512.0 / 596.5) × 100 = 85.8%** 
 
-512.0mW out of 596.5mW total (BG96 idle case) means YOLO alone accounts for 85.8% of the whole budget. Even BG96 at full LTE transmission (300mW) is barely over half of YOLO’s draw. 
+512.0mW out of 596.5mW total (BG96 idle case) means only YOLO accounts for 85.8% of the whole budget. Even BG96 at full LTE transmission (300mW) is barely over half of YOLO’s draw. 
 
