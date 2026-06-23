@@ -109,8 +109,8 @@ Sensor limited, not compute-limited, identical in Python or RTL, since both are 
 | Compute per sample (worst case, range across 5 complete runs) | 37 – 267 us | 1.78 us |
 | Idle per sample | remainder of 10ms | ~999,822 cycles asleep |
 | Fall latency | 110ms | 110ms |
-| Real-time guarantee | No — subject to OS jitter | Yes — deterministic |
-| Core usage | 1x A55 | 0 — dedicated M7 |
+| Real-time guarantee | No, subject to OS jitter | Yes, deterministic |
+| Core usage | 1x A55 | 0, dedicated M7 |
 
 
 Worth being precise about what this comparison shows. Python's average case (0.44–0.68µs across 5 runs) is actually faster than the RTL estimate (1.78µs) in every single run measured, an interpreted language beating a clock counted hardware number on the typical case. That's not RTL losing the argument, it's the wrong comparison to make. 
