@@ -32,7 +32,7 @@ Run 1’s headline numbers (avg/max CPU, memory drift, total alerts) matched Run
 
 Avg CPU 52.5%, Max CPU 53.0% (below 85% throughout, 19 checkpoints). Memory 857.9 through 858.4MB (+0.50MB over 10 minutes), no leak. 10 alerts total, fall interrupt working, no deadlocks. Log stops at 570s, the last checkpoint before the script’s 600s loop exits (see “Independent duration cross check” below for confirmation the run genuinely lasted the full duration). 
 
-## **consistency through all runs** 
+## **Observation from 2 runs** 
 
 2’s come directly from the full table above. The two runs match closely. CPU within 0.1% on average, memory drift within 0.04MB, identical alert counts. That consistency is the actual evidence the system behaves predictably rather than having gotten lucky once, the comparison doesn’t depend on Run 1 having a surviving raw log, since its summary level numbers are still real, recorded output from that run, just not row-by-row. 
 
