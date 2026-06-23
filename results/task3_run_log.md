@@ -34,7 +34,7 @@ Avg CPU 52.5%, Max CPU 53.0% (below 85% throughout, 19 checkpoints). Memory 857.
 
 ## **Observation from 2 runs** 
 
-2’s come directly from the full table above. The two runs match closely. CPU within 0.1% on average, memory drift within 0.04MB, identical alert counts. That consistency is the actual evidence the system behaves predictably rather than having gotten lucky once, the comparison doesn’t depend on Run 1 having a surviving raw log, since its summary level numbers are still real, recorded output from that run, just not row-by-row. 
+2’s come directly from the full table above. The two runs match closely. CPU within 0.1% on average, memory drift within 0.04MB, identical alert counts. That consistency is the actual evidence the system behaves predictably rather than having gotten lucky once, the comparison doesn’t depend on Run 1 having a surviving raw log, since its summary level numbers are still real, recorded output from that run. 
 
 The one real structural difference, thread count (4 vs 5), traces to a deliberate code change made between the runs. After run 1, speak() was given a 5-second watchdog timeout (in response to a real freeze during an earlier attempt), which spawns one short lived thread per voice call. That accounts for the extra thread in run 2’s count, without meaningfully changing memory or CPU behavior, the watchdog threads are short lived and don’t accumulate. Full detail in the methodology note. 
 
