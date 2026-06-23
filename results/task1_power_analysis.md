@@ -4,7 +4,7 @@
 
 Insight runs on a 2000mAh LiPo battery at 3.7V nominal: 
 
-## **Formula:** 
+Formula & calculated with measuments: 
 
 Energy mWh = capacity mAh x voltage V 
 
@@ -50,9 +50,9 @@ All three measured resolutions clear 12 hours on YOLO power alone:
 
 Because measured CPU% barely moved across resolutions (a 0.9 point spread), the power-only calculation does not meaningfully separate these three options, all three land within 16 minutes of each other on battery life. Selecting a resolution on power grounds alone would imply a precision the underlying measurement doesn’t support. 
 
-**My actual recommendation is 416x416** , and the reasoning comes from FPS, not power. While 320×320 delivers the highest performance (17.27 FPS), it uses the least image detail and may miss smaller or more distant objects. At 640×640, detection quality is likely highest, but performance drops to 5.34 FPS, increasing scene-description latency. The 416×416 setting provides the best balance, achieving 11.25 FPS while retaining significantly more spatial detail than 320×320. 
+**My actual recommendation is 416x416** , and the reasoning comes from FPS, not power. While 320×320 delivers the highest performance (17.27 FPS), it uses the least image detail and may miss smaller or more distant objects. At 640×640, detection quality is likely highest, but performance drops to 5.34 FPS, increasing scene description latency. The 416×416 setting provides the best balance, achieving 11.25 FPS while retaining significantly more spatial detail than 320×320. 
 
 A complete decision would ideally include detection accuracy (mAP) at each resolution, but that was outside the scope of this task. 
 
-**From a hardware perspective** , the benchmark demonstrates that CNN inference dominates platform power consumption. Future silicon revisions should prioritize NPU acceleration and memory-access optimization rather than CPU scaling, since CPU-only execution becomes the primary battery-life limiter. This suggests that architectural improvements in accelerator efficiency will provide significantly greater battery-life gains than increasing CPU performance alone. 
+**From a hardware perspective** , the benchmark demonstrates that CNN inference dominates platform power consumption. Future silicon revisions should prioritize NPU acceleration and memory access optimization rather than CPU scaling, since CPU only execution becomes the primary battery life limiter. This suggests that architectural improvements in accelerator efficiency will provide significantly greater battery life gains than increasing CPU performance alone. 
 
