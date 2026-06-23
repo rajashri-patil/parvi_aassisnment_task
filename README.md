@@ -4,8 +4,6 @@ This is my submission for the Parvai Technologies Hardware-AI Bridge Task. It co
 
 ## **Repo structure:** 
 
-## Repo structure
-
 ```
 ai-pipeline/
   integrated_pipeline.py        # Task 3: combined YOLO + fall detection + TTS pipeline
