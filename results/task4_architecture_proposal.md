@@ -4,9 +4,9 @@
 
 Task 1 measured YOLO26n at 416×416 on ARM64 (Oracle Ampere A1): **11.25 FPS at 512.0 mW**, the resolution Task 1 recommended. YOLO dominates Task 3's system power budget. With NPU offload at 4× FPS and 0.3× YOLO power:
 
-Total MW new = total MW old - (0.7 x YLO MW old)
-Total MW new= 596.5 - (0.7 x 512) = **238.1 MW**
-Battery Life = 7400/238.1 = **31.1 hrs** vs 12.40 hrs
+-Total MW new = total MW old - (0.7 x YLO MW old)
+-Total MW new= 596.5 - (0.7 x 512) = **238.1 MW**
+-Battery Life = 7400/238.1 = **31.1 hrs** vs 12.40 hrs
 
 Both methods land on 238.1 mW, which is a useful consistency check.
 
