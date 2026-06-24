@@ -21,9 +21,9 @@ What the NPU does not eliminate: resize, normalisation, and colour conversion st
 
 This is exactly the pattern from the CNN accelerator project: once the MAC array was fast and efficient, the constraint shifted to getting operands in and out of SRAM fast enough. The **14mW at 1GHz on 0.874mm²** came from three levers: high operand reuse (avoiding DRAM re-fetches), aggressive clock gating on idle paths, and datapath sizing to the actual model rather than over-provisioning. All three apply directly here:
 
-- **Operand reuse** — specifically whether AR1+'s NPU caches weights and feature maps on-die across the YOLO layer stack or re-reads from external memory each pass.
-- **Clock gating** — whether the NPU can sleep between frames. Insight only needs detections every 88–300ms, not continuously.
-- **Datapath sizing** — whether part of the claimed 0.3× power reflects headroom Insight is not actually using. Until these are checked against AR1+'s real datasheet, the NPU figure should be treated as a compute-driven estimate rather than a guaranteed platform result.
+- **Operand reuse** - specifically whether AR1+'s NPU caches weights and feature maps on-die across the YOLO layer stack or re-reads from external memory each pass.
+- **Clock gating** - whether the NPU can sleep between frames. Insight only needs detections every 88–300ms, not continuously.
+- **Datapath sizing** - whether part of the claimed 0.3× power reflects headroom Insight is not actually using. Until these are checked against AR1+'s real datasheet, the NPU figure should be treated as a compute-driven estimate rather than a guaranteed platform result.
 
 **Architectural takeaway:** CNN inference is the dominant system power consumer; fall detection, sensors, and alerting contribute relatively little. For production, combining an NPU for CNN inference, a Cortex-M7 for always-on sensor processing, and event-driven interrupts delivers substantially better battery life, keeping the A55 in low-power states whenever possible.
 
@@ -72,13 +72,13 @@ module fall_detector_fsm (
 endmodule
 ```
 
-Each state transition resolves in 1 cycle (comparator or counter check). Reading 6 IMU channels over ICM-42688-P's 24MHz SPI and computing magnitude takes ~178 cycles. The FSM is idle more than 99.98% of the time and can sleep on a clock-gated co-processor.
+Each state transition resolves in 1 cycle (comparator or counter check). Reading 6 IMU channels over ICM-42688-P's 24MHz SPI and computing magnitude takes 178 cycles. The FSM is idle more than 99.98% of the time and can sleep on a clock-gated co-processor.
 
 **Latency floor:** 10 samples (100ms) to confirm free-fall + 1 sample (10ms) minimum for impact = **110ms to ALERT**, regardless of implementation. The FSM adds only ~1.78 µs of compute on top. Python's average (0.44–0.68 µs) is actually faster than the RTL estimate in the typical case. That is the wrong comparison. Python's worst case ranged 37–267 µs across five runs on identical deterministic input, because variance comes from OS scheduler preemption, not the algorithm. This is the same reasoning applied to setup-time margin and metastability on forwarding paths in the RISC project. What breaks a design is the worst case, not the typical one. An FSM on a sleeping co-processor has no such failure mode; its worst case equals its average, always 178 cycles, deterministically.
 
 **Hardware vs software verdict:** Software is right for the prototype. It fits the 10ms budget on A55 and allows fast threshold tuning. For production, move it to the Cortex-M7 already on the iMX95. Same reasoning as the 28nm vs 45nm RISC synthesis comparison: a small, well-verified control FSM is cheap to close timing on at 100MHz, and multi-corner PPA analysis, using the same methodology from the RISC project, confirms how timing margin holds across process and voltage corners before trusting it in a safety-relevant path.
 
-**SVA verification:** On the RISC pipeline, hazard and forwarding correctness was verified with SVA properties against constrained-random sequences, not just hand-picked test vectors. The same applies here: properties like IMPACT_WINDOW only entered from FREE_FALL_DETECT after exactly 10 consecutive sub-threshold samples, and ALERT only fires within one cycle of FALL_CONFIRMED, should be checked as SVA assertions against randomised magnitude/gyro input. A fall detector tested only against the falls it was designed to catch has been demonstrated, not verified. Given what this alert is for, that is a higher bar than the pipeline project required.
+**SVA verification:** On the RISC pipeline, hazard and forwarding correctness was verified with SVA properties against constrained-random sequences, not just hand picked test vectors. The same applies here: properties like IMPACT_WINDOW only entered from FREE_FALL_DETECT after exactly 10 consecutive sub-threshold samples, and ALERT only fires within one cycle of FALL_CONFIRMED, should be checked as SVA assertions against randomised magnitude/gyro input. A fall detector tested only against the falls it was designed to catch has been demonstrated, not verified. Given what this alert is for, that is a higher bar than the pipeline project required.
 
 ---
 
@@ -102,17 +102,17 @@ A function is a good hardware candidate when it is **repetitive and parallel** (
 
 ### Biggest Single Change for Battery Life
 
-**NPU offload of YOLO26n**, reducing total draw from 596.5 mW to 238.1 mW, extending battery life from 12.40 to 31.1 hours, provided memory bandwidth does not absorb the gain (Section A). Moving fall detection to the M7 matters for determinism and safety, but its direct power saving is negligible (~0.052 mW from Task 3).
+**NPU offload of YOLO26n**, reducing total draw from 596.5 mW to 238.1 mW, extending battery life from 12.40 to 31.1 hours, provided memory bandwidth does not absorb the gain (Section A). Moving fall detection to the M7 matters for determinism and safety, but its direct power saving is negligible (0.052 mW from Task 3).
 
 ### Future Scope
 
 Future platform revisions can focus on three areas:
 
-1. **INT8 quantization on the NPU** — to further improve performance-per-watt beyond the baseline NPU offload gain. YOLOv8n accuracy loss with INT8 is typically under 1–2% mAP, which is acceptable for object awareness.
-2. **Fall detection FSM on the Cortex-M7 or dedicated RTL hardware** — enabling always-on operation with deterministic latency, freeing A55 cores for YOLO pre/post-processing.
-3. **Memory movement optimization between camera, NPU, and system memory** — including weight-stationary dataflow to keep YOLO weights pinned in NPU on-chip SRAM, and DMA directly from ISP to NPU input buffer bypassing the A55. Accelerator efficiency eventually becomes limited by data bandwidth rather than compute throughput. That is the next bottleneck after NPU offload.
+1. **INT8 quantization on the NPU** - to further improve performance-per-watt beyond the baseline NPU offload gain. YOLOv8n accuracy loss with INT8 is typically under 1–2% mAP, which is acceptable for object awareness.
+2. **Fall detection FSM on the Cortex-M7 or dedicated RTL hardware** - enabling always-on operation with deterministic latency, freeing A55 cores for YOLO pre/post-processing.
+3. **Memory movement optimization between camera, NPU, and system memory** - including weight-stationary dataflow to keep YOLO weights pinned in NPU on-chip SRAM, and DMA directly from ISP to NPU input buffer bypassing the A55. Accelerator efficiency eventually becomes limited by data bandwidth rather than compute throughput. That is the next bottleneck after NPU offload.
 
 Together, these improvements would further reduce system power while increasing responsiveness and scalability for future wearable AI workloads.
 
 
-> **Scope note:** Insight as built is an awareness system: object detection and fall alerting. Navigation with turn-by-turn directions would require a routing engine and active GPS on BG96, out of scope here.
+**Scope note:** Insight as built is an awareness system: object detection and fall alerting. Navigation with turn-by-turn directions would require a routing engine and active GPS on BG96, out of scope here.
