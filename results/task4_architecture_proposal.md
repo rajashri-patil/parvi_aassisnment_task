@@ -30,7 +30,8 @@ Task 2 timing (5 complete runs on the same ARM64 target): Python detector averag
 
 Two always block pattern, matching hazard/stall control from the RISC pipeline project:
 
-```verilogmodule fall_detector_fsm (
+```verilog
+module fall_detector_fsm (
     input  clk, rst_n, new_sample,
     input  magnitude, gx, gy,        // sensor inputs
     output reg alert_output
@@ -39,15 +40,13 @@ Two always block pattern, matching hazard/stall control from the RISC pipeline p
                FALL_CONFIRMED = 3, ALERT = 4;
     reg [2:0] state, next_state;
     reg [3:0] free_fall_counter;     
-    reg [5:0] impact_timeout_counter;  
+    reg [5:0] impact_timeout_counter;
 
-    // Sequential: state register, updates on clock edge
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)            state <= IDLE;
         else if (new_sample)   state <= next_state;
     end
 
-    // Combinational: next-state logic
     always @(*) begin
         next_state   = state;
         alert_output = 0;
@@ -71,7 +70,6 @@ Two always block pattern, matching hazard/stall control from the RISC pipeline p
             end
         endcase
     end
-
 endmodule
 ```
 Each state transition resolves in 1 cycle (comparator or counter check). Reading 6 IMU channels over ICM-42688-P's 24MHz SPI and computing magnitude takes 178 cycles. The FSM is idle more than 99.98% of the time and can sleep on a clock-gated co-processor.
