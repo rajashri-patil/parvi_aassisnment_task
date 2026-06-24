@@ -30,7 +30,7 @@ Task 2 timing (5 complete runs on the same ARM64 target): Python detector averag
 
 Two always block pattern, matching hazard/stall control from the RISC pipeline project:
 
-
+```verilog
 module fall_detector_fsm (
     input  clk, rst_n, new_sample,
     input  magnitude, gx, gy,
@@ -41,10 +41,12 @@ module fall_detector_fsm (
     reg [2:0] state, next_state;
     reg [3:0] free_fall_counter;       // counts to 10 (100ms)
     reg [5:0] impact_timeout_counter;  // counts to 50 (500ms)
+
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)          state <= IDLE;
         else if (new_sample) state <= next_state;
     end
+
     always @(*) begin
         next_state = state; alert_output = 0;
         case (state)
@@ -61,7 +63,7 @@ module fall_detector_fsm (
         endcase
     end
 endmodule
-
+```
 Each state transition resolves in 1 cycle (comparator or counter check). Reading 6 IMU channels over ICM-42688-P's 24MHz SPI and computing magnitude takes 178 cycles. The FSM is idle more than 99.98% of the time and can sleep on a clock-gated co-processor.
 
 **Latency floor:** 10 samples (100ms) to confirm free-fall + 1 sample (10ms) minimum for impact = **110ms to ALERT**, regardless of implementation. The FSM adds only ~1.78 µs of compute on top. Python's average (0.44–0.68 µs) is actually faster than the RTL estimate in the typical case. That is the wrong comparison. Python's worst case ranged 37–267 µs across five runs on identical deterministic input, because variance comes from OS scheduler preemption, not the algorithm. This is the same reasoning applied to setup-time margin and metastability on forwarding paths in the RISC project. What breaks a design is the worst case, not the typical one. An FSM on a sleeping co-processor has no such failure mode; its worst case equals its average, always 178 cycles, deterministically.
