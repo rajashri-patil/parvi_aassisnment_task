@@ -5,9 +5,9 @@
 Task 1 measured YOLO26n at 416×416 on ARM64 (Oracle Ampere A1): **11.25 FPS at 512.0 mW**, the resolution Task 1 recommended. YOLO dominates Task 3's system power budget. With NPU offload at 4× FPS and 0.3× YOLO power:
 
 ```
-TOTAL mW new = TOTAL mW old - (0.7 x YOLO mW old)
-TOTAL mW new = 596.5 - (0.7 x 512.0) = 238.1 mW
-Battery Life  = 7400 / 238.1 = 31.1 hrs  vs  12.40 hrs today
+TOTAL mW new = TOTAL mW old − (0.7 × YOLO mW old)
+TOTAL mW new = 596.5 − (0.7 × 512) = 238.1 mW
+Battery Life = 7400/238.1= 31.1hr vs 12.40 hrs 
 ```
 
 Both methods (delta subtraction and absolute re-sum from Task 3) land on 238.1 mW, which is a useful consistency check.
@@ -20,7 +20,7 @@ This is exactly the pattern from the CNN accelerator project: once the MAC array
 - **Clock gating** - whether the NPU can sleep between frames. Insight only needs detections every 88–300ms, not continuously.
 - **Datapath sizing** - whether part of the claimed 0.3× power reflects headroom Insight is not actually using. Until these are checked against AR1+'s real datasheet, the NPU figure should be treated as a compute-driven estimate rather than a guaranteed platform result.
 
-**Architectural takeaway:** CNN inference is the dominant system power consumer; fall detection, sensors, and alerting contribute relatively little. For production, combining an NPU for CNN inference, a Cortex-M7 for always-on sensor processing, and event-driven interrupts delivers substantially better battery life, keeping the A55 in low-power states whenever possible.
+**Architectural takeaway:** CNN inference is the dominant system power consumer; fall detection, sensors, and alerting contribute relatively little. For production, combining an NPU for CNN inference, a Cortex M7 for always-on sensor processing, and event driven interrupts delivers substantially better battery life, keeping the A55 in low-power states whenever possible.
 
 ---
 
