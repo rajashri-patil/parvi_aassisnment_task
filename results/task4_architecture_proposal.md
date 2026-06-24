@@ -30,6 +30,7 @@ Task 2 timing (5 complete runs on the same ARM64 target): Python detector averag
 
 Two always block pattern, matching hazard/stall control from the RISC pipeline project:
 
+
 module fall_detector_fsm (
     input  clk, rst_n, new_sample,
     input  magnitude, gx, gy,
@@ -40,12 +41,10 @@ module fall_detector_fsm (
     reg [2:0] state, next_state;
     reg [3:0] free_fall_counter;       // counts to 10 (100ms)
     reg [5:0] impact_timeout_counter;  // counts to 50 (500ms)
-
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)          state <= IDLE;
         else if (new_sample) state <= next_state;
     end
-
     always @(*) begin
         next_state = state; alert_output = 0;
         case (state)
