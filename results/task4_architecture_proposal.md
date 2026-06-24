@@ -30,38 +30,48 @@ Task 2 timing (5 complete runs on the same ARM64 target): Python detector averag
 
 Two always block pattern, matching hazard/stall control from the RISC pipeline project:
 
-```verilog
-module fall_detector_fsm (
+```verilogmodule fall_detector_fsm (
     input  clk, rst_n, new_sample,
-    input  magnitude, gx, gy,
+    input  magnitude, gx, gy,        // sensor inputs
     output reg alert_output
 );
-    localparam IDLE=0, FREE_FALL_DETECT=1, IMPACT_WINDOW=2,
-               FALL_CONFIRMED=3, ALERT=4;
+    localparam IDLE = 0, FREE_FALL_DETECT = 1, IMPACT_WINDOW = 2,
+               FALL_CONFIRMED = 3, ALERT = 4;
     reg [2:0] state, next_state;
-    reg [3:0] free_fall_counter;       // counts to 10 (100ms)
-    reg [5:0] impact_timeout_counter;  // counts to 50 (500ms)
+    reg [3:0] free_fall_counter;     
+    reg [5:0] impact_timeout_counter;  
 
+    // Sequential: state register, updates on clock edge
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n)          state <= IDLE;
-        else if (new_sample) state <= next_state;
+        if (!rst_n)            state <= IDLE;
+        else if (new_sample)   state <= next_state;
     end
 
+    // Combinational: next-state logic
     always @(*) begin
-        next_state = state; alert_output = 0;
+        next_state   = state;
+        alert_output = 0;
         case (state)
-            IDLE:             if (magnitude < 0.5g) next_state = FREE_FALL_DETECT;
-            FREE_FALL_DETECT: if (magnitude < 0.5g) begin
-                                  if (free_fall_counter == 10) next_state = IMPACT_WINDOW;
-                              end else next_state = IDLE;
-            IMPACT_WINDOW:    if (magnitude > 3.5g) begin
-                                  if (gx >= 20dps || gy >= 20dps) next_state = FALL_CONFIRMED;
-                                  else next_state = IDLE;  // arm swing, reject
-                              end else if (impact_timeout_counter == 50) next_state = IDLE;
-            FALL_CONFIRMED:   next_state = ALERT;
-            ALERT: begin      alert_output = 1; next_state = IDLE; end
+            IDLE:                                   
+                if (magnitude < 0.5g) next_state = FREE_FALL_DETECT;
+            FREE_FALL_DETECT:                         
+                if (magnitude < 0.5g) begin
+                    if (free_fall_counter == 10) next_state = IMPACT_WINDOW;  
+                end else next_state = IDLE;            
+            IMPACT_WINDOW:                             
+                if (magnitude > 3.5g) begin
+                    if (gx >= 20deg_per_s || gy >= 20deg_per_s)
+                        next_state = FALL_CONFIRMED;   
+                    else next_state = IDLE;            // arm swing, reject
+                end else if (impact_timeout_counter == 50) next_state = IDLE;  \
+            FALL_CONFIRMED: next_state = ALERT;        // single-cycle pass-through
+            ALERT: begin
+                alert_output = 1;                      
+                next_state   = IDLE;
+            end
         endcase
     end
+
 endmodule
 ```
 Each state transition resolves in 1 cycle (comparator or counter check). Reading 6 IMU channels over ICM-42688-P's 24MHz SPI and computing magnitude takes 178 cycles. The FSM is idle more than 99.98% of the time and can sleep on a clock-gated co-processor.
