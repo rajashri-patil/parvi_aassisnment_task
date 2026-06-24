@@ -1,10 +1,5 @@
 # Task 4: Hardware Architecture Proposal
 
-**Parvai Insight: Wearable AI for Visually Impaired Users**
-**Candidate: Rajashri Patil**
-
----
-
 ## Section A: NPU vs CPU for YOLO26n
 
 Task 1 measured YOLO26n at 416×416 on ARM64 (Oracle Ampere A1): **11.25 FPS at 512.0 mW**, the resolution Task 1 recommended. YOLO dominates Task 3's system power budget. With NPU offload at 4× FPS and 0.3× YOLO power:
