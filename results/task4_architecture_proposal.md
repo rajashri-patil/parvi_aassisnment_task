@@ -114,6 +114,5 @@ Future platform revisions can focus on three areas:
 
 Together, these improvements would further reduce system power while increasing responsiveness and scalability for future wearable AI workloads.
 
----
 
 > **Scope note:** Insight as built is an awareness system: object detection and fall alerting. Navigation with turn-by-turn directions would require a routing engine and active GPS on BG96, out of scope here.
