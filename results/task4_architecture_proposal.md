@@ -4,23 +4,21 @@
 
 Task 1 measured YOLO26n at 416×416 on ARM64 (Oracle Ampere A1): **11.25 FPS at 512.0 mW**, the resolution Task 1 recommended. YOLO dominates Task 3's system power budget. With NPU offload at 4× FPS and 0.3× YOLO power:
 
-```
-TOTAL mW new = TOTAL mW old − (0.7 × YOLO mW old)
-TOTAL mW new = 596.5 − (0.7 × 512) = 238.1 mW
-Battery Life = 7400/238.1= 31.1hr vs 12.40 hrs 
-```
+Total MW new = total MW old - (0.7 x YLO MW old)
+Total MW new= 596.5 - (0.7 x 512) = **238.1 MW**
+Battery Life = 7400/238.1 = **31.1 hrs** vs 12.40 hrs
 
-Both methods (delta subtraction and absolute re-sum from Task 3) land on 238.1 mW, which is a useful consistency check.
+Both methods land on 238.1 mW, which is a useful consistency check.
 
-What the NPU does not eliminate: resize, normalisation, and colour conversion still run on A55 unless the toolchain fuses them, and NMS/box decoding stays on CPU too. More critically, if NPU offload genuinely delivers 4× FPS (~45 FPS), input bandwidth scales from **5.8M to 23.4M values/sec**, which is the real number the memory interconnect must sustain. If the AR1+'s bus cannot keep the NPU fed at that rate, the NPU stalls on data rather than its own MACs.
+What the NPU does not eliminate: resize, normalisation, and colour conversion still run on A55 unless the toolchain fuses them, and NMS/box decoding stays on CPU too. More critically, if NPU offload genuinely delivers 4× FPS (45 FPS), input bandwidth scales from **5.8M to 23.4M values/sec**, which is the real number the memory interconnect must sustain. If the AR1+'s bus cannot keep the NPU fed at that rate, the NPU stalls on data rather than its own MACs.
 
 This is exactly the pattern from the CNN accelerator project: once the MAC array was fast and efficient, the constraint shifted to getting operands in and out of SRAM fast enough. The **14mW at 1GHz on 0.874mm²** came from three levers: high operand reuse (avoiding DRAM re-fetches), aggressive clock gating on idle paths, and datapath sizing to the actual model rather than over-provisioning. All three apply directly here:
 
 - **Operand reuse** - specifically whether AR1+'s NPU caches weights and feature maps on-die across the YOLO layer stack or re-reads from external memory each pass.
 - **Clock gating** - whether the NPU can sleep between frames. Insight only needs detections every 88–300ms, not continuously.
-- **Datapath sizing** - whether part of the claimed 0.3× power reflects headroom Insight is not actually using. Until these are checked against AR1+'s real datasheet, the NPU figure should be treated as a compute-driven estimate rather than a guaranteed platform result.
+- **Datapath sizing** - whether part of the claimed 0.3× power reflects headroom Insight is not actually using. Until these are checked against AR1+'s real datasheet, the NPU figure should be treated as a compute driven estimate rather than a guaranteed platform result.
 
-**Architectural takeaway:** CNN inference is the dominant system power consumer; fall detection, sensors, and alerting contribute relatively little. For production, combining an NPU for CNN inference, a Cortex M7 for always-on sensor processing, and event driven interrupts delivers substantially better battery life, keeping the A55 in low-power states whenever possible.
+**Architectural takeaway:** CNN inference is the dominant system power consumer; fall detection, sensors, and alerting contribute relatively little. For production, combining an NPU for CNN inference, a Cortex M7 for always-on sensor processing, and event driven interrupts delivers substantially better battery life, keeping the A55 in low power states whenever possible.
 
 ---
 
@@ -108,6 +106,5 @@ Future platform revisions can focus on three areas:
 3. **Memory movement optimization between camera, NPU, and system memory** - including weight-stationary dataflow to keep YOLO weights pinned in NPU on-chip SRAM, and DMA directly from ISP to NPU input buffer bypassing the A55. Accelerator efficiency eventually becomes limited by data bandwidth rather than compute throughput. That is the next bottleneck after NPU offload.
 
 Together, these improvements would further reduce system power while increasing responsiveness and scalability for future wearable AI workloads.
-
 
 **Scope note:** Insight as built is an awareness system: object detection and fall alerting. Navigation with turn-by-turn directions would require a routing engine and active GPS on BG96, out of scope here.
